@@ -1,6 +1,43 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+
+<!-- アクセス制限＆リンク修正用スクリプト -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    try {
+      const SECRET_KEY = "93SYa4oyAeTbhKaC1Cj3hA";
+      const params = new URLSearchParams(window.location.search);
+      const currentKey = params.get('key');
+
+      if (currentKey === SECRET_KEY) {
+        // --- アクセス許可 ---
+        // ページ内の全リンクを調べて、キーを付与する
+        const links = document.querySelectorAll('a');
+        links.forEach(link => {
+          const href = link.getAttribute('href');
+          // ローカルのHTMLファイルへのリンクかチェック (相対パスを想定)
+          if (href && href.endsWith('.html') && !href.startsWith('http')) {
+            link.href = href + '?key=' + currentKey;
+          }
+        });
+      } else {
+        // --- アクセス拒否 ---
+        document.body.style.visibility = 'hidden';
+        document.body.innerHTML = '<div style="text-align: center; padding-top: 50px; font-family: sans-serif;"><h1>アクセス権がありません</h1><p>このページは指定された場所からのみアクセスできます。</p></div>';
+        document.body.style.visibility = 'visible';
+        throw new Error("Invalid or missing access key.");
+      }
+    } catch (e) {
+      // エラー発生時も念のため拒否
+      document.body.style.visibility = 'hidden';
+      document.body.innerHTML = '<div style="text-align: center; padding-top: 50px; font-family: sans-serif;"><h1>アクセス権がありません</h1><p>このページは指定された場所からのみアクセスできます。</p></div>';
+      document.body.style.visibility = 'visible';
+      throw new Error("Access denied due to an error during key check.");
+    }
+  });
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ヒューガルポンプ異常対応チェックリスト</title>
